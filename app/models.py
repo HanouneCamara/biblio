@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String
+from sqlalchemy import Boolean, Integer, String, DateTime
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -25,3 +25,15 @@ class Utilisateur(UserMixin, db.Model):
     #vérifier un mot de passe donné
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+#Modèle Livre
+class Livre(db.Model):
+    __tablename__ = 'livres'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    titre: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    auteur: Mapped[str] = mapped_column(String(100), nullable=False)
+    disponible: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    date_ajout: Mapped[DateTime] = mapped_column(DateTime, nullable=False, server_default=db.func.now())
+    
+    def __repr__(self):
+        return f"<Livre {self.titre} par {self.auteur}>"

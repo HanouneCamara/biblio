@@ -34,3 +34,4 @@ def register_routes(app):
     def logout():
         logout_user()
         return redirect(url_for('login'))
+
