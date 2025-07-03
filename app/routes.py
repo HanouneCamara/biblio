@@ -34,4 +34,33 @@ def register_routes(app):
     def logout():
         logout_user()
         return redirect(url_for('login'))
+    
+    #route livre
+    @app.route("/livres/ajouter", methods=["GET", "POST"])
+    @login_required
+    def ajouter():
+        if request.method == "POST":
+            titre = request.form.get("titre")
+            auteur = request.form.get("auteur")
+            
+            # Vérifier que les champs sont remplis
+            if not titre or not auteur:
+                flash("Tous les champs sont obligatoires.")
+                return render_template("ajouter_livre.html")
+            
+            # Vérifier l’unicité du titre
+            from app.models import Livre
+            if Livre.query.filter_by(titre=titre).first():
+                flash("Ce livre existe déjà.")
+                return render_template("ajouter_livre.html")
+            
+            # Créer et enregistrer
+            livre = Livre(titre=titre, auteur=auteur)
+            from app import db
+            db.session.add(livre)
+            db.session.commit()
 
+            flash("Livre ajouté avec succès.")
+            return redirect(url_for("index"))
+
+        return render_template("ajouter_livre.html")
