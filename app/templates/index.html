@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Accueil</title>
+</head>
+<body>
+    <h1>Bienvenue dans Biblio</h1>
+
+    <p>Vous êtes connecté en tant que {{ current_user.username }}.</p>
+
+    <a href="{{ url_for('logout') }}">Se déconnecter</a>
+</body>
+</html>
