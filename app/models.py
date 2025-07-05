@@ -32,6 +32,8 @@ class Livre(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     titre: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     auteur: Mapped[str] = mapped_column(String(100), nullable=False)
+    annee: Mapped[int] = mapped_column(Integer, default=2000, nullable=False)
+    nombre_exemplaires: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     disponible: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     date_ajout: Mapped[DateTime] = mapped_column(DateTime, nullable=False, server_default=db.func.now())
     

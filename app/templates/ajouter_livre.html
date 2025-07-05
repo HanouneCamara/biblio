@@ -22,6 +22,16 @@
             <input type="text" class="form-control" id="auteur" name="auteur" placeholder="Ex: Albert Camus" required>
           </div>
 
+          <div class="mb-3">
+            <label for="annee" class="form-label">Année de publication</label>
+            <input type="number" class="form-control" id="annee" name="annee" placeholder="Ex: 1942" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="nombre_exemplaires" class="form-label">Nombre d’exemplaires</label>
+            <input type="number" class="form-control" id="nombre_exemplaires" name="nombre_exemplaires" placeholder="Ex: 5" required>
+          </div>
+
           <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">📘 Ajouter le Livre</button>
             <a href="{{ url_for('index') }}" class="btn btn-secondary">← Retour</a>

@@ -22,9 +22,39 @@
       </a>
     </div>
 
-    <div class="alert alert-info text-center">
-      📌 À venir : affichage des livres et gestion des emprunts.
+    {% if livres %}
+    <table class="table table-hover table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th>Titre</th>
+          <th>Auteur</th>
+          <th>Année</th>
+          <th>Exemplaires</th>
+          <th>Disponible</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for livre in livres %}
+        <tr>
+          <td>{{ livre.titre }}</td>
+          <td>{{ livre.auteur }}</td>
+          <td>{{ livre.annee }}</td>
+          <td>{{ livre.nombre_exemplaires }}</td>
+          <td>{{ 'Oui' if livre.disponible else 'Non' }}</td>
+          <td>
+            <a href="{{ url_for('modifier', livre_id=livre.id) }}" class="btn btn-sm btn-warning">✏️ Modifier</a>
+            <a href="{{ url_for('supprimer', livre_id=livre.id) }}" class="btn btn-sm btn-danger">🗑️ Supprimer</a>
+        </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning text-center" role="alert">
+      Aucun livre enregistré pour le moment.
     </div>
+    {% endif %}
   </div>
 </body>
 </html>

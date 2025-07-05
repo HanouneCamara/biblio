@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modifier Livre - Biblio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container mt-5">
+    <h3>✏️ Modifier le livre</h3>
+    <form method="POST">
+      <div class="mb-3">
+        <label for="titre" class="form-label">Titre</label>
+        <input type="text" class="form-control" id="titre" name="titre" value="{{ livre.titre }}" required>
+      </div>
+      <div class="mb-3">
+        <label for="auteur" class="form-label">Auteur</label>
+        <input type="text" class="form-control" id="auteur" name="auteur" value="{{ livre.auteur }}" required>
+      </div>
+      <div class="mb-3">
+        <label for="annee" class="form-label">Année</label>
+        <input type="number" class="form-control" id="annee" name="annee" value="{{ livre.annee }}" required>
+      </div>
+      <div class="mb-3">
+        <label for="nombre_exemplaires" class="form-label">Nombre d'exemplaires</label>
+        <input type="number" class="form-control" id="nombre_exemplaires" name="nombre_exemplaires" value="{{ livre.nombre_exemplaires }}" required>
+      </div>
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="disponible" name="disponible" {% if livre.disponible %}checked{% endif %}>
+        <label class="form-check-label" for="disponible">Disponible</label>
+      </div>
+      <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
+      <a href="{{ url_for('index') }}" class="btn btn-secondary">← Annuler</a>
+    </form>
+  </div>
+</body>
+</html>
