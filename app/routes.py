@@ -1,6 +1,7 @@
+from datetime import datetime
 from flask import render_template, request, redirect, url_for, flash, abort
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models import Utilisateur, Livre
+from app.models import Utilisateur, Livre, Emprunt
 from app import db
 
 def register_routes(app):
@@ -134,3 +135,48 @@ def register_routes(app):
             return redirect(url_for('index'))
         # Si GET, afficher confirmation simple
         return render_template('confirmer_suppression.html', livre=livre)
+    
+    #route emprunt
+    @app.route("/emprunts/ajouter", methods=["GET", "POST"])
+    @login_required
+    def ajouter_emprunt():
+        livres_disponibles = Livre.query.filter_by(disponible=True).all()
+        
+        if request.method == 'POST':
+            nom_emprunteur = request.form.get("nom_emprunteur")
+            identifiant_emprunteur = request.form.get("identifiant_emprunteur")
+            telephone = request.form.get("telephone")
+            email = request.form.get("email")
+            livre_id = request.form.get("livre_id")
+            date_retour_str = request.form.get("date_retour_prevue")
+            
+            
+            # Validation de base
+            if not (nom_emprunteur and identifiant_emprunteur and telephone and email and livre_id and date_retour_str):
+                flash("Tous les champs sont obligatoires.")
+                return render_template("ajouter_emprunt.html", livres=livres_disponibles)
+
+            try:
+                date_retour = datetime.strptime(date_retour_str, "%Y-%m-%d").date()
+            except ValueError:
+                flash("Date de retour invalide (format attendu : YYYY-MM-DD).")
+                return render_template("ajouter_emprunt.html", livres=livres_disponibles)
+            
+            emprunt = Emprunt(
+                nom_emprunteur=nom_emprunteur,
+                identifiant_emprunteur=identifiant_emprunteur,
+                telephone=telephone,
+                email=email,
+                livre_id=int(livre_id),
+                date_retour_prevue=date_retour
+            )
+            
+            # Marquer le livre comme indisponible
+            livre = Livre.query.get(int(livre_id))
+            livre.disponible = False
+
+            db.session.commit()
+            flash("Emprunt enregistré avec succès.")
+            return redirect(url_for("index"))
+        
+        return render_template("ajouter_emprunt.html", livres=livres_disponibles)

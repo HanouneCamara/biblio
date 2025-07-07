@@ -45,9 +45,17 @@ class Livre(db.Model):
 class Emprunt(db.Model):
     __tablename__ = 'emprunts'
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    nom_emprunteur: Mapped[str] = mapped_column(db.String(100), nullable=False)
+    nom_emprunteur: Mapped[str] = mapped_column(String(100), nullable=False)
+    identifiant_emprunteur: Mapped[str] = mapped_column(String(50), nullable=False)
+    telephone: Mapped[str] = mapped_column(String(20), nullable=False)
+    email: Mapped[str] = mapped_column(String(120), nullable=False)
+
     livre_id: Mapped[int] = mapped_column(ForeignKey("livres.id"), nullable=False)
     date_emprunt: Mapped[date] = mapped_column(Date, default=date.today, nullable=False)
+    date_retour_prevue: Mapped[date] = mapped_column(Date, nullable=False)
     rendu: Mapped[bool] = mapped_column(Boolean, default=False)
-    
+
     livre = relationship("Livre", backref="emprunts")
+
+    def __repr__(self):
+        return f"<Emprunt {self.nom_emprunteur} - Livre ID {self.livre_id}>"
