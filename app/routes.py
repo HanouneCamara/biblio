@@ -193,3 +193,24 @@ def register_routes(app):
     def liste_emprunts():
         emprunts = Emprunt.query.order_by(Emprunt.date_emprunt.desc()).all()
         return render_template("liste_emprunts.html", emprunts=emprunts)
+    
+    @app.route('/emprunts/rendre/<int:emprunt_id>', methods=['POST'])
+    @login_required
+    def rendre_emprunt(emprunt_id):
+        emprunt = Emprunt.query.get_or_404(emprunt_id)
+
+        if emprunt.rendu:
+            flash("Ce livre a déjà été rendu.")
+            return redirect(url_for('liste_emprunts'))
+
+        # Marquer comme rendu
+        emprunt.rendu = True
+
+        # Mettre à jour le stock
+        livre = emprunt.livre
+        livre.nombre_exemplaires += 1
+        livre.disponible = True  # si au moins 1 exemplaire, on peut remettre True (ou gérer une logique plus fine)
+
+        db.session.commit()
+        flash("Livre marqué comme rendu avec succès.")
+        return redirect(url_for('liste_emprunts'))
