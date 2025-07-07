@@ -1,6 +1,7 @@
+from datetime import date
 from flask_login import UserMixin
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Boolean, Integer, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import Boolean, Date, ForeignKey, Integer, String, DateTime
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -39,3 +40,14 @@ class Livre(db.Model):
     
     def __repr__(self):
         return f"<Livre {self.titre} par {self.auteur}>"
+    
+#Modèle emprunt
+class Emprunt(db.Model):
+    __tablename__ = 'emprunts'
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    nom_emprunteur: Mapped[str] = mapped_column(db.String(100), nullable=False)
+    livre_id: Mapped[int] = mapped_column(ForeignKey("livres.id"), nullable=False)
+    date_emprunt: Mapped[date] = mapped_column(Date, default=date.today, nullable=False)
+    rendu: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    livre = relationship("Livre", backref="emprunts")
