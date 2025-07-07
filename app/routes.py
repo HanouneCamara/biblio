@@ -136,47 +136,60 @@ def register_routes(app):
         # Si GET, afficher confirmation simple
         return render_template('confirmer_suppression.html', livre=livre)
     
-    #route emprunt
+    #route ajouter emprunt
     @app.route("/emprunts/ajouter", methods=["GET", "POST"])
     @login_required
     def ajouter_emprunt():
-        livres_disponibles = Livre.query.filter_by(disponible=True).all()
-        
-        if request.method == 'POST':
-            nom_emprunteur = request.form.get("nom_emprunteur")
+        # On ne propose que les livres dont le stock > 0
+        livres_disponibles = Livre.query.filter(Livre.nombre_exemplaires > 0).all()
+
+        if request.method == "POST":
+            nom_emprunteur       = request.form.get("nom_emprunteur")
             identifiant_emprunteur = request.form.get("identifiant_emprunteur")
-            telephone = request.form.get("telephone")
-            email = request.form.get("email")
-            livre_id = request.form.get("livre_id")
-            date_retour_str = request.form.get("date_retour_prevue")
-            
-            
-            # Validation de base
-            if not (nom_emprunteur and identifiant_emprunteur and telephone and email and livre_id and date_retour_str):
+            telephone            = request.form.get("telephone")
+            email                = request.form.get("email")
+            livre_id             = request.form.get("livre_id")
+            date_retour_str      = request.form.get("date_retour_prevue")
+
+            # Validation minimale
+            if not all([nom_emprunteur, identifiant_emprunteur, telephone, email, livre_id, date_retour_str]):
                 flash("Tous les champs sont obligatoires.")
                 return render_template("ajouter_emprunt.html", livres=livres_disponibles)
 
             try:
                 date_retour = datetime.strptime(date_retour_str, "%Y-%m-%d").date()
             except ValueError:
-                flash("Date de retour invalide (format attendu : YYYY-MM-DD).")
+                flash("Date de retour invalide (format attendu : YYYY-MM-DD).")
                 return render_template("ajouter_emprunt.html", livres=livres_disponibles)
-            
+
+            livre = Livre.query.get(int(livre_id))
+            if not livre or livre.nombre_exemplaires <= 0:
+                flash("Le livre sélectionné n’est plus disponible.")
+                return render_template("ajouter_emprunt.html", livres=livres_disponibles)
+
+            # 1️⃣  Création de l’emprunt
             emprunt = Emprunt(
                 nom_emprunteur=nom_emprunteur,
                 identifiant_emprunteur=identifiant_emprunteur,
                 telephone=telephone,
                 email=email,
-                livre_id=int(livre_id),
+                livre_id=livre.id,
                 date_retour_prevue=date_retour
             )
-            
-            # Marquer le livre comme indisponible
-            livre = Livre.query.get(int(livre_id))
-            livre.disponible = False
+            db.session.add(emprunt)
+
+            # 2️⃣  Mise à jour du stock livre
+            livre.nombre_exemplaires -= 1
+            livre.disponible = livre.nombre_exemplaires > 0  # dispo si stock > 0
 
             db.session.commit()
             flash("Emprunt enregistré avec succès.")
-            return redirect(url_for("index"))
-        
-        return render_template("ajouter_emprunt.html", livres=livres_disponibles)
+            return redirect(url_for("liste_emprunts"))
+
+        return render_template("ajouter_emprunt.html", livres=livres_disponibles)    
+    #liste emprunts
+    @app.route("/emprunts")
+    @login_required
+    def liste_emprunts():
+        emprunts = Emprunt.query.order_by(Emprunt.date_emprunt.desc()).all()
+        return render_template("liste_emprunts.html", emprunts=emprunts)

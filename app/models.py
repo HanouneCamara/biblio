@@ -54,7 +54,6 @@ class Emprunt(db.Model):
     date_emprunt: Mapped[date] = mapped_column(Date, default=date.today, nullable=False)
     date_retour_prevue: Mapped[date] = mapped_column(Date, nullable=False)
     rendu: Mapped[bool] = mapped_column(Boolean, default=False)
-
     livre = relationship("Livre", backref="emprunts")
 
     def __repr__(self):

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liste des Emprunts - Biblio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container mt-5">
+    <h1 class="mb-4">📋 Liste des emprunts</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary mb-3">← Retour</a>
+
+    {% if emprunts %}
+    <table class="table table-bordered table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>Nom Emprunteur</th>
+          <th>Livre</th>
+          <th>Date d'emprunt</th>
+          <th>Date de retour prévue</th>
+          <th>Rendu</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emprunt in emprunts %}
+        <tr>
+          <td>{{ emprunt.nom_emprunteur }}</td>
+          <td>{{ emprunt.livre.titre }}</td>
+          <td>{{ emprunt.date_emprunt.strftime('%d/%m/%Y') }}</td>
+          <td>{{ emprunt.date_retour_prevue.strftime('%d/%m/%Y') }}</td>
+          <td>
+            {% if emprunt.rendu %}
+              <span class="badge bg-success">Oui</span>
+            {% else %}
+              <span class="badge bg-warning text-dark">Non</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p>Aucun emprunt enregistré pour l'instant.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
